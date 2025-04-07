@@ -29,8 +29,6 @@ class AuthController extends Controller
     // Assign a default role for new registrations
 
     // $validated['role_id'] = Role::where('name', 'customer')->first()->id;
-    
-    
     // or whatever default role
 
     if ($request->hasFile('user_photo')) {

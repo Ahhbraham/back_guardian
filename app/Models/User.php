@@ -37,7 +37,8 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        // //Add debugging
+        
+             // //Add debugging
         // \Log::info('isAdmin check:', [
         //     'user_id' => $this->id,
         //     'role_id' => $this->role_id,
