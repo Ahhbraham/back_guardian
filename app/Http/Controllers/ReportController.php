@@ -21,7 +21,7 @@ class ReportController extends Controller
             'phone' => ['required', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:255'],
             'crime_type' => ['required', 'string', 'in:Theft,Vandalism,Harassment,Fraud,Other'],
-            'incidentcycle_date' => ['required', 'date'],
+            'incident_date' => ['required', 'date'],
             'incident_location' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'attachments' => ['nullable', 'array', 'max:5'],
