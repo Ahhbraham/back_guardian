@@ -9,6 +9,27 @@ use Illuminate\Support\Facades\Validator;
 class ReportController extends Controller
 {
     /**
+     * Get all reports
+     */
+    public function index()
+    {
+        try {
+            $reports = Report::latest()->get();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $reports,
+                'message' => 'Reports retrieved successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving reports: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Create a new report.
      */
     public function store(Request $request)
@@ -34,19 +55,20 @@ class ReportController extends Controller
 
         try {
             // Prepare data for storage
-            $data = $request->all();
+            $data = $request->except('attachments');
             $attachmentPaths = [];
 
             // Handle file uploads
             if ($request->hasFile('attachments')) {
                 foreach ($request->file('attachments') as $file) {
                     $path = $file->store('uploads', 'public');
-                    $attachmentPaths[] = $path;
+                    $attachmentPaths[] = [
+                        'file_path' => $path,
+                        'original_name' => $file->getClientOriginalName()
+                    ];
                 }
+                $data['attachments'] = $attachmentPaths;
             }
-
-            // Store attachment paths in data
-            $data['attachments'] = $attachmentPaths;
 
             // Create report in database
             $report = Report::create($data);

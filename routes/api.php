@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Route;
 // Public Routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+//reports
 Route::post('/reports', [ReportController::class, 'store']);
+Route::get('/reports', [ReportController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     // Auth Routes
