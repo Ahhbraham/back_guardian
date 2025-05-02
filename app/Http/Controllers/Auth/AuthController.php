@@ -66,11 +66,11 @@ class AuthController extends Controller
             ]);
         }
 
-        if (! $user->is_active) {
-            throw ValidationException::withMessages([
-                'email' => ['This account is inactive.'],
-            ]);
-        }
+        // if (! $user->is_active) {
+        //     throw ValidationException::withMessages([
+        //         'email' => ['This account is inactive.'],
+        //     ]);
+        // }
 
         $token = $user->createToken('auth-token')->plainTextToken;
 

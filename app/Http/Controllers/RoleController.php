@@ -4,105 +4,152 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class RoleController extends Controller
 {
+    /**
+     * Display a listing of roles.
+     */
     public function index()
     {
         try {
-            $roles = Role::all();
-            if ($roles->count() > 0) {
-                return response()->json([$roles], 200);
-            } else {
-                return "No role was found";
-            }
+            $roles = Role::withTrashed()->get();
+            return response()->json([
+                'success' => true,
+                'data' => $roles,
+                'count' => $roles->count()
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(["Error" => "Error Fetching Roles"], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching roles: ' . $e->getMessage()
+            ], 500);
         }
     }
 
-    // Create Role function
-    public function CreateRole(Request $request)
+    /**
+     * Create a new role.
+     */
+    public function store(Request $request)
     {
         $validated = $request->validate([
-            "name" => "required|string|max:255",
-            "slug" => "required|string|max:255|unique:roles",
-            "description" => "nullable|string|max:1000",
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:roles',
+            'description' => 'nullable|string|max:1000',
         ]);
 
         try {
-            $role = new Role();
-            $role->name = $request->name;
-            $role->slug = $request->slug;
-            $role->description = $request->description;
+            $role = Role::create([
+                'name' => $request->name,
+                'slug' => Str::slug($request->slug),
+                'description' => $request->description
+            ]);
 
-            $createdRole = $role->save();
-            if ($createdRole) {
-                return "Role Created Successfully";
-            } else {
-                return "Role Not Created!";
-            }
+            return response()->json([
+                'success' => true,
+                'data' => $role,
+                'message' => 'Role created successfully'
+            ], 201);
         } catch (\Exception $e) {
-            return response()->json(["Error" => "Error Creating Role"], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating role: ' . $e->getMessage()
+            ], 500);
         }
     }
 
-    // Read Role function
-    public function getRole($id)
+    /**
+     * Display the specified role.
+     */
+    public function show($id)
     {
         try {
-            $fetchedRole = Role::findOrFail($id);
-
-            if ($fetchedRole) {
-                return response()->json($fetchedRole);
-            } else {
-                return "Role was not found for ID: `$id`";
-            }
+            $role = Role::withTrashed()->findOrFail($id);
+            return response()->json([
+                'success' => true,
+                'data' => $role
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(["Error" => "Error Fetching Role"], 401);
+            return response()->json([
+                'success' => false,
+                'message' => 'Role not found or error fetching role: ' . $e->getMessage()
+            ], 404);
         }
     }
 
-    // Update function
-    public function updateRole(Request $request, $id)
+    /**
+     * Update the specified role.
+     */
+    public function update(Request $request, $id)
     {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:roles,slug,' . $id,
+            'description' => 'nullable|string|max:1000',
+        ]);
+
         try {
-            $roleToUpdate = Role::findOrFail($id);
+            $role = Role::findOrFail($id);
+            $role->update([
+                'name' => $request->name,
+                'slug' => Str::slug($request->slug),
+                'description' => $request->description
+            ]);
 
-            if ($roleToUpdate) {
-                $roleToUpdate->name = $request->name; // Fixed assignment syntax
-                $roleToUpdate->slug = $request->slug; // Fixed assignment syntax
-                $roleToUpdate->description = $request->description; // Fixed assignment syntax
-
-                $updatedRole = $roleToUpdate->save();
-                if ($updatedRole) {
-                    return response()->json($roleToUpdate, 201); // Fixed variable name
-                } else {
-                    return "Role was Not Updated for ID: `$id`";
-                }
-            }
+            return response()->json([
+                'success' => true,
+                'data' => $role,
+                'message' => 'Role updated successfully'
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(["Error" => "Error Updating Role"], 401);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating role: ' . $e->getMessage()
+            ], 500);
         }
     }
 
-    // Delete function
-    public function deleteRole($id)
+    /**
+     * Soft delete the specified role.
+     */
+    public function destroy($id)
     {
         try {
-            $roleToDelete = Role::findOrFail($id);
+            $role = Role::findOrFail($id);
+            $role->delete();
 
-            if ($roleToDelete) {
-                $deletedRole = $roleToDelete->delete(); // Fixed deletion syntax
-
-                if ($deletedRole) {
-                    return "Role has been deleted";
-                } else {
-                    return "Role was not deleted";
-                }
-            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Role soft deleted successfully'
+            ], 200);
         } catch (\Exception $e) {
-            return "Error deleting the record";
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting role: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Restore a soft-deleted role.
+     */
+    public function restore($id)
+    {
+        try {
+            $role = Role::onlyTrashed()->findOrFail($id);
+            $role->restore();
+
+            return response()->json([
+                'success' => true,
+                'data' => $role,
+                'message' => 'Role restored successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error restoring role: ' . $e->getMessage()
+            ], 404);
         }
     }
 }
