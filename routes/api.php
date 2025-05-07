@@ -1,14 +1,16 @@
 <?php
+
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-//reports
+// Reports
 Route::post('/reports', [ReportController::class, 'store']);
 Route::get('/reports', [ReportController::class, 'index']);
 
@@ -30,4 +32,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('role/{id}', [RoleController::class, 'getRole']);
     Route::put('role/{id}', [RoleController::class, 'updateRole']);
     Route::delete('role/{id}', [RoleController::class, 'deleteRole']);
+
+    // Message Routes
+    Route::post('/messages', [MessageController::class, 'sendMessage']);
+    Route::get('/messages', [MessageController::class, 'getMessages']);
 });
