@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Route;
 // Public Routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-// Reports
 Route::post('/reports', [ReportController::class, 'store']);
 Route::get('/reports', [ReportController::class, 'index']);
 
@@ -31,6 +30,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('role/{id}', [RoleController::class, 'getRole']);
     Route::put('role/{id}', [RoleController::class, 'updateRole']);
     Route::delete('role/{id}', [RoleController::class, 'deleteRole']);
-
- 
 });
