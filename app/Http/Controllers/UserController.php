@@ -27,6 +27,8 @@ class UserController extends Controller
             'password' => ['required', 'string', 'min:8'],
             'user_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'role_id' => ['required', 'exists:roles,id'],
+            'longitude' => ['required'],
+            'latitude' => ['required'],
         ]);
 
         if ($request->hasFile('user_photo')) {

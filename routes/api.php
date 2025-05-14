@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SosController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -11,10 +12,7 @@ use App\Models\User;
 // Public Routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-
-// Report Routes
-Route::post('/reports', [ReportController::class, 'store']);
-Route::get('/reports', [ReportController::class, 'index']);
+ 
 
 // Authenticated Routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -35,4 +33,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/role/{id}', [RoleController::class, 'getRole']);
     Route::put('/role/{id}', [RoleController::class, 'updateRole']);
     Route::delete('/role/{id}', [RoleController::class, 'deleteRole']);
+
+    // Report Routes
+    Route::post('/reports', [ReportController::class, 'store']);
+    Route::get('/reports', [ReportController::class, 'index']);
+
+     // SOS Routes
+    Route::post('/sos', [SosController::class, 'store']);
+    Route::get('/sos', [SosController::class, 'index']);
+   
 });
