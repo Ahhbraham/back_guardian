@@ -14,7 +14,42 @@ class SosController extends Controller
     //     $this->middleware('auth:api');
     // }
 
-    // Rename sendEmergency to store
+    // Get all SOS reports
+    public function index()
+    {
+        try {
+            $sosReports = Sos::with('user')->latest()->get();
+
+            $formatted = $sosReports->map(function ($report) {
+                return [
+                    'id' => $report->id,
+                    'sos_type' => $report->sos_type,
+                    'description' => $report->description,
+                    'latitude' => $report->latitude,
+                    'longitude' => $report->longitude,
+                    'created_at' => $report->created_at->toDateTimeString(),
+                    'user' => [
+                        'id' => $report->user->id ?? null,
+                        'name' => $report->user->name ?? null,
+                        'email' => $report->user->email ?? null,
+                    ]
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $formatted,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch SOS reports.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    // Store a new SOS report
     public function store(Request $request)
     {
         // Validate the incoming request
