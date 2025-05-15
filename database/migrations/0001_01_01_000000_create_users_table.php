@@ -20,8 +20,7 @@ return new class extends Migration
             $table->string('user_photo')->nullable();
             $table->rememberToken();
             $table->timestamps();
-            $table->float('latitude')->nullable();
-            $table->float('longitude')->nullable();
+
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
