@@ -8,8 +8,6 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Log;
 
-
-//addedhasfactory
 class User extends Authenticatable
 {
     use HasApiTokens, Notifiable, HasFactory;
@@ -39,23 +37,23 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        //Add debugging
+        // Debugging log
         Log::info('isAdmin check:', [
             'user_id' => $this->id,
             'role_id' => $this->role_id,
-            'is_admin' => $this->role_id === 5  // or whatever your admin role ID is
+            'is_admin' => $this->role_id === 5
         ]);
 
-        return $this->role_id === 5; // adjust based on your admin role ID
+        return $this->role_id === 5; // Admin role ID is 5 as per roles table seeding
     }
 
     public function abilities()
     {
-        // Implement based on your requirements
+        // Simplified abilities based on role
         return [
-            'view-dashboard' => $this->can('view-dashboard'),
-            'manage-users' => $this->can('manage-users'),
-            'update-users' => $this->can('update-users', $this),
+            'view-dashboard' => $this->role_id !== 1, // User role (ID 1) can't view dashboard
+            'manage-users' => $this->isAdmin(),
+            'update-users' => $this->isAdmin(),
         ];
     }
 }

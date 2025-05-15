@@ -25,18 +25,14 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
-            'user_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'user_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Made user_photo optional
             'role_id' => ['required', 'exists:roles,id'],
         ]);
 
         if ($request->hasFile('user_photo')) {
             $filename = $request->file('user_photo')->store('posts', 'public');
-        } else {
-            $filename = Null;
+            $validated['user_photo'] = $filename;
         }
-
-        $validated['user_photo'] = $filename;
-
 
         $validated['password'] = Hash::make($validated['password']);
         $user = User::create($validated);
@@ -56,17 +52,15 @@ class UserController extends Controller
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'password' => ['sometimes', 'string', 'min:8'],
-            'user_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'user_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Made user_photo optional
             'role_id' => ['sometimes', 'exists:roles,id'],
             'is_active' => ['sometimes', 'boolean'],
         ]);
 
         if ($request->hasFile('user_photo')) {
             $filename = $request->file('user_photo')->store('posts', 'public');
-        } else {
-            $filename = Null;
+            $validated['user_photo'] = $filename;
         }
-        $user->user_photo = $filename;
 
         if (isset($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);

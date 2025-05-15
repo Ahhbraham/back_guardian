@@ -19,28 +19,21 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'user_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            // Remove role_id from public registration
+            'user_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Made user_photo optional
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
 
-        // Assign a default role for new registrations
-
-        // $validated['role_id'] = Role::where('name', 'customer')->first()->id;
-        // or whatever default role
+        // Assign default 'User' role (ID 1 from roles table)
+        $validated['role_id'] = Role::where('slug', 'user')->first()->id;
 
         if ($request->hasFile('user_photo')) {
             $filename = $request->file('user_photo')->store('users', 'public');
-        } else {
-            $filename = Null;
+            $validated['user_photo'] = $filename;
         }
-
-        $validated['user_photo'] = $filename;
 
         $user = User::create($validated);
 
-        // Optionally auto-login the user
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
@@ -65,11 +58,11 @@ class AuthController extends Controller
             ]);
         }
 
-        // if (! $user->is_active) {
-        //     throw ValidationException::withMessages([
-        //         'email' => ['This account is inactive.'],
-        //     ]);
-        // }
+        if (! $user->is_active) {
+            throw ValidationException::withMessages([
+                'email' => ['This account is inactive.'],
+            ]);
+        }
 
         $token = $user->createToken('auth-token')->plainTextToken;
 

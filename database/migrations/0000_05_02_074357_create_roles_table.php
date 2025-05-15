@@ -7,13 +7,10 @@ use App\Models\Role;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('roles', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // bigIncrements, matches foreignId in users
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->string('description', 1000)->nullable();
@@ -35,9 +32,6 @@ return new class extends Migration
         }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('roles');
